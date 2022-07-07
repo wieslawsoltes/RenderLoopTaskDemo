@@ -42,7 +42,10 @@ public partial class MainWindow : Window
     {
         base.OnDetachedFromVisualTree(e);
 
-        RenderLoopTaskFunc.Remove(_renderTask);
-        _renderTask = null;
+        if (_renderTask is { })
+        {
+            RenderLoopTaskFunc.Remove(_renderTask);
+            _renderTask = null;
+        }
     }
 }
