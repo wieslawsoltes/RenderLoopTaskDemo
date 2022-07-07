@@ -28,14 +28,14 @@ public class RenderLoopTaskFunc : IRenderLoopTask
         {
             return null;
         }
-        
+
         var renderTask = new RenderLoopTaskFunc(update, render);
-        
+
         renderLoop.Add(renderTask);
 
         return renderTask;
     }
-    
+
     public static bool Remove(IRenderLoopTask? renderTask)
     {
         if (renderTask is null)
