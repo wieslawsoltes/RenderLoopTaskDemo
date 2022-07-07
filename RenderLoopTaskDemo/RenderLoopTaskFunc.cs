@@ -34,8 +34,7 @@ public class RenderLoopTaskFunc : IRenderLoopTask
     {
         if (renderTask is not null)
         {
-            var renderLoop = AvaloniaLocator.Current.GetService<IRenderLoop?>();
-            renderLoop?.Remove(renderTask);
+            AvaloniaLocator.Current.GetService<IRenderLoop?>()?.Remove(renderTask);
         }
     }
 }
