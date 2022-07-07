@@ -1,32 +1,56 @@
 ﻿using System;
-using Avalonia.Controls;
+using Avalonia;
 using Avalonia.Rendering;
 
 namespace RenderLoopTaskDemo;
 
-public class RenderLoopTask : IRenderLoopTask
+public class RenderLoopTaskFunc : IRenderLoopTask
 {
-    private int _frame;
-    private TimeSpan _previousTime;
-    private TimeSpan _frameTime;
-    private readonly TextBlock _textBlock;
-    
-    public RenderLoopTask(TextBlock textBlock)
+    private readonly Action<TimeSpan>? _update;
+    private readonly Action? _render;
+
+    public RenderLoopTaskFunc(Action<TimeSpan>? update, Action? render)
     {
-        _textBlock = textBlock;
-    }
-    
-    public void Update(TimeSpan time)
-    {
-        _frameTime = time - _previousTime;
-        _previousTime = time;
-        _textBlock.Text = $"{_frameTime.TotalMilliseconds}ms | {_frame}";
+        _update = update;
+        _render = render;
     }
 
-    public void Render()
-    {
-        _frame++;
-    }
+    public void Update(TimeSpan time) => _update?.Invoke(time);
+
+    public void Render() => _render?.Invoke();
 
     public bool NeedsUpdate => true;
+
+    public static IRenderLoopTask? Add(Action<TimeSpan>? update, Action? render)
+    {
+        var renderLoop = AvaloniaLocator.Current.GetService<IRenderLoop?>();
+        if (renderLoop is null)
+        {
+            return null;
+        }
+        
+        var renderTask = new RenderLoopTaskFunc(update, render);
+        
+        renderLoop.Add(renderTask);
+
+        return renderTask;
+    }
+    
+    public static bool Remove(IRenderLoopTask? renderTask)
+    {
+        if (renderTask is null)
+        {
+            return false;
+        }
+
+        var renderLoop = AvaloniaLocator.Current.GetService<IRenderLoop?>();
+        if (renderLoop is null)
+        {
+            return false;
+        }
+
+        renderLoop.Remove(renderTask);
+
+        return true;
+    }
 }
