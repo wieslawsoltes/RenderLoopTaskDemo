@@ -23,34 +23,19 @@ public class RenderLoopTaskFunc : IRenderLoopTask
 
     public static IRenderLoopTask? Add(Action<TimeSpan>? update, Action? render)
     {
-        var renderLoop = AvaloniaLocator.Current.GetService<IRenderLoop?>();
-        if (renderLoop is null)
-        {
-            return null;
-        }
-
         var renderTask = new RenderLoopTaskFunc(update, render);
 
-        renderLoop.Add(renderTask);
+        AvaloniaLocator.Current.GetService<IRenderLoop?>()?.Add(renderTask);
 
         return renderTask;
     }
 
-    public static bool Remove(IRenderLoopTask? renderTask)
+    public static void Remove(IRenderLoopTask? renderTask)
     {
-        if (renderTask is null)
+        if (renderTask is not null)
         {
-            return false;
+            var renderLoop = AvaloniaLocator.Current.GetService<IRenderLoop?>();
+            renderLoop?.Remove(renderTask);
         }
-
-        var renderLoop = AvaloniaLocator.Current.GetService<IRenderLoop?>();
-        if (renderLoop is null)
-        {
-            return false;
-        }
-
-        renderLoop.Remove(renderTask);
-
-        return true;
     }
 }
